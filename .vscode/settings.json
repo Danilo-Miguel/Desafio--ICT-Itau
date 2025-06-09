@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./multicloud_tasks_project"
+    ]
+}

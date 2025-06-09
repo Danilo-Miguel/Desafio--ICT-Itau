@@ -1,20 +1,39 @@
 from flask import Blueprint, jsonify
-from app.services.aws_service import get_aws_data
-from app.services.azure_service import get_azure_data
-from app.services.gcp_service import get_gcp_data
+from app.services.aws_service import get_aws_raw_data
+from app.services.azure_service import get_azure_raw_data
+from app.services.gcp_service import get_gcp_raw_data
 
 metrics_bp = Blueprint('metrics', __name__)
 
 @metrics_bp.route('/data', methods=['GET'])
 def get_data():
     return jsonify({
-        "aws": get_aws_data(),
-        "azure": get_azure_data(),
-        "gcp": get_gcp_data()
+        "aws": get_aws_raw_data(),
+        "azure": get_azure_raw_data(),
+        "gcp": get_gcp_raw_data()
     })
 
+def simulate_metrics(raw_data):
+    import random
+    simulated_data = []
+
+    for item in raw_data:
+        storage = float(item.get("2020", 0)) if item.get("2020", "..") != ".." else random.uniform(100, 1000)
+        requests = random.randint(100, 5000)
+
+        cpu_usage = round((requests % 100) + random.uniform(-5, 5), 2)
+        billing = round(storage * 0.23 + random.uniform(0, 10), 2)
+        compliance_score = round(100 - (requests % 30) + random.uniform(-2, 2), 2)
+
+        simulated_data.append({
+            "cpu_usage": max(0, min(cpu_usage, 100)),
+            "billing": max(0, billing),
+            "compliance_score": max(0, min(compliance_score, 100))
+        })
+
+    return simulated_data
+
 def compute_avg(data):
-    # Filtra os dicionários que têm todas as chaves necessárias
     filtered = [
         d for d in data
         if all(k in d for k in ("cpu_usage", "billing", "compliance_score"))
@@ -39,12 +58,12 @@ def compute_avg(data):
 
 @metrics_bp.route('/metrics', methods=['GET'])
 def get_metrics():
-    aws = get_aws_data()
-    azure = get_azure_data()
-    gcp = get_gcp_data()
+    aws_sim = simulate_metrics(get_aws_raw_data())
+    azure_sim = simulate_metrics(get_azure_raw_data())
+    gcp_sim = simulate_metrics(get_gcp_raw_data())
 
     return jsonify({
-        "aws": compute_avg(aws),
-        "azure": compute_avg(azure),
-        "gcp": compute_avg(gcp)
+        "aws": compute_avg(aws_sim),
+        "azure": compute_avg(azure_sim),
+        "gcp": compute_avg(gcp_sim)
     })
