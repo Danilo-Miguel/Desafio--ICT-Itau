@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify
 from app.services.aws_service import get_aws_raw_data
 from app.services.azure_service import get_azure_raw_data
 from app.services.gcp_service import get_gcp_raw_data
+from flasgger.utils import swag_from
 import random
 
 metrics_bp = Blueprint('metrics', __name__)
@@ -48,8 +49,11 @@ def compute_avg(data):
         "compliance_score_avg": round(compliance_avg, 2)
     }
 
-# Rota /data geral (todos os dados crus separados)
 @metrics_bp.route('/data', methods=['GET'])
+@swag_from({
+    'tags': ['Data'],
+    'responses': {200: {'description': 'Dados crus de todos os serviços'}}
+})
 def get_data():
     return jsonify({
         "aws": get_aws_raw_data(),
@@ -57,8 +61,11 @@ def get_data():
         "gcp": get_gcp_raw_data()
     })
 
-# Rota /metrics geral (métricas simuladas e calculadas para todos)
 @metrics_bp.route('/metrics', methods=['GET'])
+@swag_from({
+    'tags': ['Metrics'],
+    'responses': {200: {'description': 'Métricas simuladas e agregadas'}}
+})
 def get_metrics():
     aws_sim = simulate_metrics(get_aws_raw_data())
     azure_sim = simulate_metrics(get_azure_raw_data())
@@ -70,33 +77,37 @@ def get_metrics():
         "gcp": compute_avg(gcp_sim)
     })
 
-# Rotas individuais para cada serviço - dados crus
 @metrics_bp.route('/data/aws', methods=['GET'])
+@swag_from({'tags': ['Data'], 'responses': {200: {'description': 'Dados AWS'}}})
 def get_aws_data():
     return jsonify(get_aws_raw_data())
 
 @metrics_bp.route('/data/azure', methods=['GET'])
+@swag_from({'tags': ['Data'], 'responses': {200: {'description': 'Dados Azure'}}})
 def get_azure_data():
     return jsonify(get_azure_raw_data())
 
 @metrics_bp.route('/data/gcp', methods=['GET'])
+@swag_from({'tags': ['Data'], 'responses': {200: {'description': 'Dados GCP'}}})
 def get_gcp_data():
     return jsonify(get_gcp_raw_data())
 
-# Rotas individuais para cada serviço - métricas
 @metrics_bp.route('/metrics/aws', methods=['GET'])
+@swag_from({'tags': ['Metrics'], 'responses': {200: {'description': 'Métricas AWS'}}})
 def get_aws_metrics():
     raw = get_aws_raw_data()
     simulated = simulate_metrics(raw)
     return jsonify(compute_avg(simulated))
 
 @metrics_bp.route('/metrics/azure', methods=['GET'])
+@swag_from({'tags': ['Metrics'], 'responses': {200: {'description': 'Métricas Azure'}}})
 def get_azure_metrics():
     raw = get_azure_raw_data()
     simulated = simulate_metrics(raw)
     return jsonify(compute_avg(simulated))
 
 @metrics_bp.route('/metrics/gcp', methods=['GET'])
+@swag_from({'tags': ['Metrics'], 'responses': {200: {'description': 'Métricas GCP'}}})
 def get_gcp_metrics():
     raw = get_gcp_raw_data()
     simulated = simulate_metrics(raw)
