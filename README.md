@@ -4,7 +4,7 @@ Objetivo
 Desenvolver uma API que consome dados multicloud e retorna métricas em tempo real, como uso de CPU, billing (custo) e compliance.
 
 Descrição
-Foi criada uma API em Python utilizando Flask para esse propósito. Os dados são mockados, mas baseados em datasets reais baixados do Kaggle — uma plataforma que oferece diversos conjuntos de dados públicos para projetos de ciência de dados e machine learning. São eles: Global Internet Usage by Country (2000-2023); Large Dataset of Cars e QS World University Rankings
+Foi criada uma API em Python utilizando Flask para esse propósito. Os dados são mockados, mas baseados em datasets reais baixados do Kaggle, uma plataforma que oferece diversos conjuntos de dados públicos para projetos de ciência de dados e machine learning. São eles: Global Internet Usage by Country (2000-2023); Large Dataset of Cars e QS World University Rankings
 
 Esses dados foram armazenados em um storage interno da aplicação e carregados simulando uma coleta em tempo real para cada provedor: AWS, GCP e Azure. Com base nessa coleta simulada, são geradas métricas fictícias (fake) para uso de CPU, custo e compliance.
 
